@@ -13,26 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-    - name: Debug SSH Setup
-      run: |
-        cat ~/.ssh/private_key
-        ls -l ~/.ssh/private_key
+    - name: Install sshpass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
 
     - name: Deploy to VPS
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}  # Add your SSH password as a secret
       run: |
-        scp -i ~/.ssh/private_key -r ./* $SSH_USERNAME@$SSH_HOST:/root/lazzez-serverapp
-        ssh -i ~/.ssh/private_key $SSH_USERNAME@$SSH_HOST "
+        sshpass -p "${SSH_PASSWORD}" scp -r ./* $SSH_USERNAME@$SSH_HOST:/root/lazzez-serverapp
+        sshpass -p "${SSH_PASSWORD}" ssh $SSH_USERNAME@$SSH_HOST "
           cd /root/lazzez-serverapp &&
           npm install &&
           pm2 restart lazeez-backend || pm2 start server.js --name lazeez-backend
