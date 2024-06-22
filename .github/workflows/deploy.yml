@@ -15,6 +15,7 @@ jobs:
 
     - name: Install SSH Key
       run: |
+        mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
         chmod 600 private_key
         ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
