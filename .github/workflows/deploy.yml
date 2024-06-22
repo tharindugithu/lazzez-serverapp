@@ -13,12 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install SSH Key
+    - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-        chmod 600 private_key
-        ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/private_key
+        chmod 600 ~/.ssh/private_key
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Debug SSH Setup
+      run: |
+        cat ~/.ssh/private_key
+        ls -l ~/.ssh/private_key
 
     - name: Deploy to VPS
       env:
@@ -26,8 +31,8 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
       run: |
-        scp -i private_key -r ./* $SSH_USERNAME@$SSH_HOST:/root/lazzez-serverapp
-        ssh -i private_key $SSH_USERNAME@$SSH_HOST "
+        scp -i ~/.ssh/private_key -r ./* $SSH_USERNAME@$SSH_HOST:/root/lazzez-serverapp
+        ssh -i ~/.ssh/private_key $SSH_USERNAME@$SSH_HOST "
           cd /root/lazzez-serverapp &&
           npm install &&
           pm2 restart lazeez-backend || pm2 start server.js --name lazeez-backend
