@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.get("/api",(req,res)=>{
-     res.send("all good and done!!")
+     res.send("all good and done & dusted!!")
 })
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
