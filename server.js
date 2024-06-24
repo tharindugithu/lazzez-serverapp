@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.get("/api",async(req,res)=>{
      const user = await User.create({
-        name: "John Doe",
+        name: "John Doe Test",
      })
      user.save();
      res.status(200).json({
